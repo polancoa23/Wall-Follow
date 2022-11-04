@@ -41,12 +41,6 @@ int main()
         while(analog(front_IR) <= mintarget)
         {
             forward(); 
-            //motor(rmotor,0);
-            //motor(lmotor,50);
-            //motor(rmotor,50);
-        	//motor(lmotor,50);
-            
-        	//if(analog(5) >= target)
             if(analog(5) > 2700)
             {
     		motor(rmotor,minispeed);
@@ -56,10 +50,7 @@ int main()
             {
             motor(rmotor,0);
     		motor(lmotor,minispeed);
-            }
-            
-            	//follow();
-        	
+            }       	
         } 
     }
     return 0;   
@@ -75,7 +66,7 @@ void forward()
     motor(rmotor,speed);
     motor(lmotor,speed);
 }
-void follow() // this needs to be mini_left and mini_right for greater than 2700 and less than 2700 
+void follow() 
 { 
     motor(rmotor,speed);
     motor(lmotor,0);
@@ -83,20 +74,6 @@ void follow() // this needs to be mini_left and mini_right for greater than 2700
     motor(rmotor,0);
     motor(lmotor,speed);
     msleep(pause);
-}
-
-void mini_left()
-{
-    if(analog(5) > 2700)
-    motor(rmotor,minispeed);
-    motor(lmotor,0);
-}
-
-void mini_right()
-{
-    if(analog(5) < 2700)
-    motor(rmotor,0);
-    motor(lmotor,minispeed);
 }
 
 //to make it follow the wall when going straight set a range of values to where it turns right/left because our left/right squiggly line we create does not work
