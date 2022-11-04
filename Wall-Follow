@@ -1,79 +1,77 @@
 #include <kipr/wombat.h>
 //VARIABLES
-//increase in val as gets closer
-//right side:600-800
-//front side: 2400
-int lmotor = 3;
-int rmotor = 0;
-int pause = 1600;
-int speed = 40;
-int front_IR = 0;
-int target = 2900;
-int mintarget = 2500;
-int minispeed = 25;
+int lmotor = 3; // left motor is plugged into the port #3
+int rmotor = 0; // right motor is plugged into port #0
+int pause = 1600; // used for 1.6 second left
+int speed = 40;// motors use 40% of power; used for the left turn, forward, and adjust functions  
+int front_IR = 0; // the front range finder is plugged into analog port #0
+int side_IR = 5; // the side range finder is plugged into analog port #5
+int target = 2900; // the side range finder sensor value that, when reached, triggers the adjust action
+int mintarget = 2500; // the front range finder sensor value that, when reached, stops the robot from moving forward
+int midtarget= 2700; // the side range finder sensor value that, when below or above, triggers a similar adjust action
+int minispeed = 25; // motors use 25% of power, used for the adjust action after the robot makes the left turn  
 
 //analog(0)
-//DECLARE VARIABLES
-void left_turn();
-void forward();
-void follow();
+//DECLARE FUNCTIONS
+void left_turn(); // function used to make the tight, left spin turn
+void forward(); // function used to make the robot move forward at 40% speed
+void follow(); // function used to make the adjust action of a right pivotal turn and a left pivotal turn
 
 int main()
 {
-    printf("Hello World\n");
-    int i = 0;
-    if(i < 1)
+    int i = 0;// counter variable. checks which step of the process the robot is at( going to the left corner or going up the right wall until the box)
+    if(i < 1)// if it is in the first step of going to the left corner it will perform the following:
     {
-        while(analog(front_IR) <= mintarget)
+        while(analog(front_IR) <= mintarget) // while the sensor value of the front range finder is less than the target(at the perfect distance away from the right wall to turn) it will perform the following:
         {
-        	forward();
-        	if(analog(5) >= target)
+        	forward();// run the function used to make the robot move forward at 40% speed. so the robot will keep moving forward until it reaches the target
+        	if(analog(side_IR) >= target) // if the sensor value of the side ranger finder is greater than the target(too close to the bottom wall) it will perform the following:
             {
-            	follow();
+            	follow(); // run the function used to make the adjust action of a right pivotal turn and a left pivotal turn. So it will adjust and then keep going forward
         	}
     	}
-        ao();
-        i++;
+        ao(); // motors shut off
+        i++; // counter variable goes up 1. This lets us know that the 1st step is done and we are now moving on to the 2nd. 
     }
-    if(i == 1)
+    if(i == 1)// if it is in the second step of turning and going up the right wall until the box, it will perform the following:
     {
-        left_turn();
-        while(analog(front_IR) <= mintarget)
+        left_turn(); // run the function used to make the tight, left spin turn
+        while(analog(front_IR) <= mintarget) // while the sensor value of the front range finder is less than the target(at the perfect distance away from the top wall to stop in the box) it will perform the following: 
         {
-            forward(); 
-            if(analog(5) > 2700)
+            forward(); // run the function used to make the robot move forward at 40% speed. so the robot will keep moving forward until it reaches the target
+            if(analog(side_IR) > midtarget) // if the sensor value of the side ranger finder is greater than the target(too close to the right wall) it will perform the following:
             {
-    		motor(rmotor,minispeed);
-    		motor(lmotor,0);
+    		motor(rmotor,minispeed);// right motor moves at 25% speed
+    		motor(lmotor,0); // left motor stays still, so there's a small right pivotal turn
             }
-            if(analog(5) < 2700)
+            if(analog(side_IR) < midtarget) if the sensor value of the side ranger finder is less than the target(too far from the right wall) it will perform the following:
             {
-            motor(rmotor,0);
-    		motor(lmotor,minispeed);
+            motor(rmotor,0); // right motor stays still
+    		motor(lmotor,minispeed); // left motor moves at 25% speed, so there's a small left pivotal turn
             }       	
         } 
     }
-    return 0;   
+    ao(); // motors shut off
+    return 0; // code ends
 }
-void left_turn()
-{
-    motor(lmotor, -speed);
-    motor(rmotor, speed);
-    msleep(pause);
+//INITIALIZE FUNCTIONS
+void left_turn() 
+{ // function used to make the tight, left spin turn
+    motor(lmotor, -speed); // left motor moves in reverse
+    motor(rmotor, speed); // right motor moves forward
+    msleep(pause); // the motors move to make the turn for 1.6 seconds
 }
 void forward()
-{
-    motor(rmotor,speed);
-    motor(lmotor,speed);
+{ // function used to make the robot move forward at 40% speed
+    motor(rmotor,speed); // right motors moves at 40% speed
+    motor(lmotor,speed); // left motor moves at 40% speed
 }
 void follow() 
-{ 
-    motor(rmotor,speed);
-    motor(lmotor,0);
-    msleep(pause);
-    motor(rmotor,0);
-    motor(lmotor,speed);
-    msleep(pause);
+{ // function used to make the adjust action of a right pivotal turn and a left pivotal turn
+    motor(rmotor,speed); // right motor moves at 40% speed
+    motor(lmotor,0); // left motor stays still
+    msleep(pause); // the motors make the small left pivotal turn for 1.6 seconds
+    motor(rmotor,0); // right motor stays still
+    motor(lmotor,speed); // left motor moves at 40% speed
+    msleep(pause); // the motors make the small right pivotal turn for 1.6 seconds
 }
-
-//to make it follow the wall when going straight set a range of values to where it turns right/left because our left/right squiggly line we create does not work
