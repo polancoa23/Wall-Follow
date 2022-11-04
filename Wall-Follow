@@ -1,0 +1,102 @@
+#include <kipr/wombat.h>
+//VARIABLES
+//increase in val as gets closer
+//right side:600-800
+//front side: 2400
+int lmotor = 3;
+int rmotor = 0;
+int pause = 1600;
+int speed = 40;
+int front_IR = 0;
+int target = 2900;
+int mintarget = 2500;
+int minispeed = 25;
+
+//analog(0)
+//DECLARE VARIABLES
+void left_turn();
+void forward();
+void follow();
+
+int main()
+{
+    printf("Hello World\n");
+    int i = 0;
+    if(i < 1)
+    {
+        while(analog(front_IR) <= mintarget)
+        {
+        	forward();
+        	if(analog(5) >= target)
+            {
+            	follow();
+        	}
+    	}
+        ao();
+        i++;
+    }
+    if(i == 1)
+    {
+        left_turn();
+        while(analog(front_IR) <= mintarget)
+        {
+            forward(); 
+            //motor(rmotor,0);
+            //motor(lmotor,50);
+            //motor(rmotor,50);
+        	//motor(lmotor,50);
+            
+        	//if(analog(5) >= target)
+            if(analog(5) > 2700)
+            {
+    		motor(rmotor,minispeed);
+    		motor(lmotor,0);
+            }
+            if(analog(5) < 2700)
+            {
+            motor(rmotor,0);
+    		motor(lmotor,minispeed);
+            }
+            
+            	//follow();
+        	
+        } 
+    }
+    return 0;   
+}
+void left_turn()
+{
+    motor(lmotor, -speed);
+    motor(rmotor, speed);
+    msleep(pause);
+}
+void forward()
+{
+    motor(rmotor,speed);
+    motor(lmotor,speed);
+}
+void follow() // this needs to be mini_left and mini_right for greater than 2700 and less than 2700 
+{ 
+    motor(rmotor,speed);
+    motor(lmotor,0);
+    msleep(pause);
+    motor(rmotor,0);
+    motor(lmotor,speed);
+    msleep(pause);
+}
+
+void mini_left()
+{
+    if(analog(5) > 2700)
+    motor(rmotor,minispeed);
+    motor(lmotor,0);
+}
+
+void mini_right()
+{
+    if(analog(5) < 2700)
+    motor(rmotor,0);
+    motor(lmotor,minispeed);
+}
+
+//to make it follow the wall when going straight set a range of values to where it turns right/left because our left/right squiggly line we create does not work
